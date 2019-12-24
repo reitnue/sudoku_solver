@@ -6,4 +6,5 @@ if __name__ == '__main__':
     with open('../test/test1.json', 'r') as test1_file:
         test1 = json.loads(test1_file.read())
 
-    print(test1)
+    for x in test1:
+        print(' '.join(map(str, x)))
