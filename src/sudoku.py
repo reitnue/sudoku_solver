@@ -15,6 +15,7 @@ def compute_row_col(square):
     return row, col
 '''
 row, col are both zero-indexed
+assumes all boards are valid
 '''
 class Sudoku:
     def __init__(self, board=None):
@@ -42,12 +43,20 @@ class Sudoku:
         return sorted(list(result))
 
     def fill_number(self, row, col, number):
-        if number not in self.valid_numbers(row, col):
+        if number not in self.valid_numbers(row, col) or self.board[row, col] != 0:
             return -1
         self.board[row, col] = number
         self.rows[row].add(number)
         self.cols[col].add(number)
         self.squares[compute_square(row, col)].add(number)
+        return 0
+
+    def remove_number(self, row, col):
+        num = self.board[row, col]
+        self.board[row, col] = 0
+        if num in self.rows[row]: self.rows[row].remove(num)
+        if num in self.cols[col]: self.cols[col].remove(num)
+        if num in self.squares[compute_square(row, col)]: self.squares[compute_square(row, col)].remove(num)
         return 0
 
     def is_filled(self, row, col):
