@@ -47,6 +47,20 @@ def numberwise(game, test=False):
         if not change:
             break
 
+def backtracking(game, test=False):
+    if game.is_completed():
+        return True
+    for row in range(9):
+        for col in range(9):
+            if not game.is_filled(row, col):
+                for num in range(1, 10):
+                    if game.fill_number(row, col, num) == 0:
+                        if not backtracking(game): # did not work -> backtrack
+                            # remove number
+                            game.remove_number(row, col)
+                        else:
+                            return True
+                if not game.is_filled(row, col): return False
 
 if __name__ == '__main__':
     # test1
@@ -54,10 +68,15 @@ if __name__ == '__main__':
         tests = json.loads(test_file.read())
     
     temp = Sudoku(tests[0])
-    cellwise(temp, test=True)
-    temp = Sudoku(tests[0])
-    numberwise(temp, test=True)
-
+    temp = Sudoku(tests[1])
+    print(temp)
+    print('-' * 17)
+    print(temp)
+    cellwise(temp, test=False)
+    numberwise(temp, test=False)
+    print(temp)
+    print(backtracking(temp))
+    print(temp)
 
     # for test in tests:
     #     temp = Sudoku(test)
