@@ -1,0 +1,9 @@
+# https://www.sudoku-solutions.com/
+online sudoku solver and helper
+- has step by step solutions
+- has additional methods that I don't think i have implemented
+
+# https://sugoku.herokuapp.com/board?difficulty=medium
+use to generate sudokus of different levels
+- https://github.com/berto/sugoku
+
