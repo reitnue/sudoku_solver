@@ -9,6 +9,10 @@ NUMBERS = [x for x in range(1, 10)]
 def compute_square(row, col):
     return ((row // 3) * 3) + (col // 3)
 
+def compute_row_col(square):
+    row = 3 * (square // 3)
+    col = 3 * (square % 3)
+    return row, col
 '''
 row, col are both zero-indexed
 '''
@@ -56,29 +60,58 @@ class Sudoku:
         result &= all(map((lambda x: x == 9), map(len, self.squares)))
         return result
 
+    # axis 0 -> row
+    # axis 1 -> col
+    # returns possible positions for number in specified index
+    def number_check(self, number, index, axis=0):
+        set_lists = self.rows if axis == 0 else self.cols
+        if number in set_lists[index]:
+            return [] # alreayd in the row/col
+        valid_pos = []
+        for jndex in range(9):
+            if axis == 0:
+                if not self.is_filled(index, jndex):
+                    valid_pos.append((index, jndex))
+            elif axis == 1:
+                if not self.is_filled(jndex, index):
+                    valid_pos.append((jndex, index))
+
+        return valid_pos
+
+    # returns possible positions for number in specified square
+    def number_check_square(self, number, square):
+        if number in self.squares[square]:
+            return [] # alreayd in the square
+        valid_pos = []
+        row, col = compute_row_col(square)
+        for index in range(row, row+3):
+            for jndex in range(col, col+3):
+                if not self.is_filled(index, jndex):
+                    if number in self.valid_numbers(index, jndex): # O(n) technically, but the list is constant sized - 9
+                        valid_pos.append((index, jndex))
+        
+        return valid_pos
+
 if __name__ == '__main__':
     with open('../test/test03.json', 'r') as test1_file:
         test1 = json.loads(test1_file.read())
     temp = Sudoku(test1)
     print(temp)
-    
+    for _ in range(2):
+        for ax in range(2):
+            for index in range(9):
+                for number in range(1, 10):
+                    pos = temp.number_check(number, index, axis=ax)
+                    if len(pos) == 1:
+                        temp.fill_number(pos[0][0], pos[0][1], number)
+        for square in range(9):
+            for number in range(1, 10):
+                pos = temp.number_check_square(number, square)
+                if len(pos) == 1:
+                    temp.fill_number(pos[0][0], pos[0][1], number)
 
-    # print('-----------------')
-    count = 1
-    while True:
-        print('--------{}--------'.format(count))
-        count += 1
-        change = False
-        for i in range(9):
-            for j in range(9):
-                if not temp.is_filled(i, j):
-                    if len(temp.valid_numbers(i, j)) == 1:
-                        temp.fill_number(i, j, temp.valid_numbers(i, j)[0])
-                        change = True
+        print('-----------------')
         print(temp)
-        # print('-----------------')
-        if not change:
-            break
     print(temp.is_completed())
     # with open('../test/test01_solved.json', 'w') as test1_solved:
     #     test1_solved.write(json.dumps(temp.board.tolist(), indent=2))
