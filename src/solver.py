@@ -2,10 +2,10 @@ import sys
 import json
 from sudoku import Sudoku
 
-def cellwise(game):
+def cellwise(game, test=False):
     count = 1
     while True:
-        print('--------{}--------'.format(count))
+        if test: print('--------{}--------'.format(count))
         count += 1
         change = False
         for i in range(9):
@@ -14,7 +14,7 @@ def cellwise(game):
                     if len(game.valid_numbers(i, j)) == 1:
                         game.fill_number(i, j, game.valid_numbers(i, j)[0])
                         change = True
-        print(game)
+        if test: print(game)
         # print('-----------------')
         if not change:
             break
