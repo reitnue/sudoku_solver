@@ -51,30 +51,34 @@ class Sudoku:
 
     def is_completed(self):
         result = True
-        result &= all(map(len, self.rows))
-        result &= all(map(len, self.cols))
-        result &= all(map(len, self.squares))
+        result &= all(map((lambda x: x == 9), map(len, self.rows)))
+        result &= all(map((lambda x: x == 9), map(len, self.cols)))
+        result &= all(map((lambda x: x == 9), map(len, self.squares)))
         return result
 
 if __name__ == '__main__':
-    with open('../test/test1.json', 'r') as test1_file:
+    with open('../test/test03.json', 'r') as test1_file:
         test1 = json.loads(test1_file.read())
     temp = Sudoku(test1)
     print(temp)
     
-    print('-----------------')
 
-    print('rows', temp.rows)
-    print('cols', temp.cols)
-    print('squares', temp.squares)
-
-    print('-----------------')
-    for _ in range(2):
+    # print('-----------------')
+    count = 1
+    while True:
+        print('--------{}--------'.format(count))
+        count += 1
+        change = False
         for i in range(9):
             for j in range(9):
                 if not temp.is_filled(i, j):
                     if len(temp.valid_numbers(i, j)) == 1:
                         temp.fill_number(i, j, temp.valid_numbers(i, j)[0])
+                        change = True
         print(temp)
-        print('-----------------')
+        # print('-----------------')
+        if not change:
+            break
     print(temp.is_completed())
+    # with open('../test/test01_solved.json', 'w') as test1_solved:
+    #     test1_solved.write(json.dumps(temp.board.tolist(), indent=2))
