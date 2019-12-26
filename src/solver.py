@@ -3,8 +3,8 @@ import json
 from sudoku import Sudoku
 
 def cellwise(game, test=False):
-    print('cellwise')
-    count = 1
+    if test: print('cellwise')
+    count = 0
     while True:
         if test: print('--------{}--------'.format(count))
         count += 1
@@ -19,10 +19,10 @@ def cellwise(game, test=False):
         # print('-----------------')
         if not change:
             break
-    return game.is_completed()
+    return count > 1
 
 def numberwise(game, test=False):
-    print('numberwise')
+    if test: print('numberwise')
     count = 0
     while True:
         if test: print('--------{}--------'.format(count))
@@ -46,6 +46,7 @@ def numberwise(game, test=False):
         if test: print(game)
         if not change:
             break
+    return count > 1
 
 def backtracking(game, test=False):
     if game.is_completed():
@@ -62,25 +63,43 @@ def backtracking(game, test=False):
                             return True
                 if not game.is_filled(row, col): return False
 
+def human_first_backtracking(game, test=False):
+    while True:
+        change = False
+        change |= numberwise(game, test=test)
+        change |= cellwise(game, test=test)
+        if not change:
+            break
+
+    return backtracking(game)
+
+
+def probabilistic_backtracking(game, test=False):
+    pass
+
 if __name__ == '__main__':
     # test1
     with open('../test/easy_tests.json', 'r') as test_file:
         tests = json.loads(test_file.read())
     
-    temp = Sudoku(tests[0])
-    temp = Sudoku(tests[1])
-    print(temp)
-    print('-' * 17)
-    print(temp)
-    cellwise(temp, test=False)
-    numberwise(temp, test=False)
-    print(temp)
-    print(backtracking(temp))
-    print(temp)
+    # temp = Sudoku(tests[0])
+    # temp = Sudoku(tests[1])
+    # print(temp)
+    # print('-' * 17)
+    # print(temp)
+    # cellwise(temp, test=False)
+    # numberwise(temp, test=False)
+    # print(temp)
+    # print(backtracking(temp))
+    # print(temp)
 
-    # for test in tests:
-    #     temp = Sudoku(test)
-    #     cellwise(temp, test=True)
-    #     numberwise(temp, test=True)
-
-    #     break
+    for test in tests:
+        temp = Sudoku(test)
+        print(human_first_backtracking(temp))
+        # print(backtracking(temp))
+        print(temp)
+        # cellwise(temp, test=False)
+        # numberwise(temp, test=False)
+        # backtracking(temp)
+        # print(temp.is_completed())
+        # break
