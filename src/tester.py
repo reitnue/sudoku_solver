@@ -48,7 +48,7 @@ def generate_more_boards(num_test):
             test.write(json.dumps(boards))
 
 if __name__ == '__main__':
-    # solvers = [solver.backtracking, solver.human_first_backtracking]
-    # tester(solvers, difficulty='hard')
+    solvers = [solver.backtracking, solver.human_first_backtracking]
+    tester(solvers, difficulty='easy')
 
-    generate_more_boards(20)
+    # generate_more_boards(20)

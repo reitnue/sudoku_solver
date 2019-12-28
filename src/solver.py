@@ -64,16 +64,25 @@ def backtracking(game, test=False):
                             return True
                 if not game.is_filled(row, col): return False
 
+# order matters
+'''
+cellwise -> numberwise (fastest)
+'''
 def human_first_backtracking(game, test=False):
     while True:
         change = False
-        change |= numberwise(game, test=test)
         change |= cellwise(game, test=test)
+        change |= numberwise(game, test=test)
         if not change:
             break
 
     return backtracking(game)
 
+'''
+backtrack with human methods
+'''
+def human_mixed_backtracking(game, test=False):
+    pass
 
 def probabilistic_backtracking(game, test=False):
     pass
@@ -83,36 +92,11 @@ if __name__ == '__main__':
     with open('../test/easy_tests.json', 'r') as test_file:
         tests = json.loads(test_file.read())
     
-    # temp = Sudoku(tests[0])
-    # temp = Sudoku(tests[1])
-    # print(temp)
-    # print('-' * 17)
-    # print(temp)
-    # cellwise(temp, test=False)
-    # numberwise(temp, test=False)
-    # print(temp)
-    # print(backtracking(temp))
-    # print(temp)
-    human_time = Timer('Human Time')
-    backtrack_time = Timer('Backtrack Time')
-    for test in tests:
-        temp = Sudoku(test)
-        human_time.start()
+    temp_timer = Timer('temp')
+    for _ in range(50):
+        temp = Sudoku(tests[0])
+        temp_timer.start()
         human_first_backtracking(temp)
-        human_time.stop()
-        # print(temp)
+        temp_timer.stop()
 
-        temp = Sudoku(test)
-        backtrack_time.start()
-        backtracking(temp)
-        backtrack_time.stop()
-        
-        # print(temp)
-        # cellwise(temp, test=False)
-        # numberwise(temp, test=False)
-        # backtracking(temp)
-        # print(temp.is_completed())
-        # break
-
-    human_time.summary()
-    backtrack_time.summary()
+    temp_timer.summary()
