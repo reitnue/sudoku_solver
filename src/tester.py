@@ -48,7 +48,13 @@ def generate_more_boards(num_test):
             test.write(json.dumps(boards))
 
 if __name__ == '__main__':
-    solvers = [solver.backtracking, solver.human_first_backtracking]
-    tester(solvers, difficulty='easy')
+    solvers = [solver.numberwise_backtracking, solver.cellwise_backtracking, 
+               solver.numberwise_cellwise_backtracking, 
+               solver.cellwise_numberwise_backtracking,
+               solver.backtracking]
+    print(sys.argv[1])
+    if sys.argv[1] not in DIFFICULTIES:
+        sys.stderr.write("invalid option\n")
+    tester(solvers, difficulty=sys.argv[1])
 
     # generate_more_boards(20)

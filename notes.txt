@@ -12,6 +12,8 @@ use to generate sudokus of different levels
 [ ] Probabilistic Backtracking
 [ ] Backtracking with human solving until nothing can be done then continue backtracking
 [ ] add priorities to cells/numbers
+[ ] cell weightings to improve guessing
+[ ] how many guesses metric
 
 # Testers
 [ ] variance

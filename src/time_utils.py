@@ -6,6 +6,7 @@ import math
 SUMMARY = '''------------------------------
 Name               : {:30}
 Count              : {}
+Total Time         : {:.5f}s
 Average Time       : {:.5f}s
 Standard Deviation : {:.5f}s
 ------------------------------'''
@@ -35,6 +36,7 @@ class Timer():
     def summary(self):
         print(SUMMARY.format(self.name, 
                              self.count, 
+                             self.total_time,
                              self.total_time / self.count, 
                              math.sqrt(stat.variance(self.times))))
 

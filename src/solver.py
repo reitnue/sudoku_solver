@@ -68,20 +68,35 @@ def backtracking(game, test=False):
 '''
 cellwise -> numberwise (fastest)
 '''
-def human_first_backtracking(game, test=False):
+def human_first_backtracking(game, humans, test=False):
     while True:
         change = False
-        change |= cellwise(game, test=test)
-        change |= numberwise(game, test=test)
+        for human in humans:
+            change |= human(game, test=test)
         if not change:
             break
-
     return backtracking(game)
+
+def numberwise_backtracking(game, test=False):
+    return human_first_backtracking(game, [numberwise])
+
+def numberwise_cellwise_backtracking(game, test=False):
+    return human_first_backtracking(game, [numberwise, cellwise])
+
+def cellwise_backtracking(game, test=False):
+    return human_first_backtracking(game, [cellwise])
+
+def cellwise_numberwise_backtracking(game, test=False):
+    return human_first_backtracking(game, [cellwise, numberwise])
 
 '''
 backtrack with human methods
+1. backtrack method one -> 
+keep track of which cells were filled in remove then for backtrack
+2. keep this information in game board ->
+keep a tuple (#, level) for each level/depth of the backtracking
 '''
-def human_mixed_backtracking(game, test=False):
+def human_mixed_backtracking_1(game, test=False):
     pass
 
 def probabilistic_backtracking(game, test=False):
@@ -96,7 +111,7 @@ if __name__ == '__main__':
     for _ in range(50):
         temp = Sudoku(tests[0])
         temp_timer.start()
-        human_first_backtracking(temp)
+        numberwise_cellwise_backtracking(temp)
         temp_timer.stop()
 
     temp_timer.summary()
