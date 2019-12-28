@@ -1,6 +1,7 @@
 import sys
 import json
 from sudoku import Sudoku
+from time_utils import Timer
 
 def cellwise(game, test=False):
     if test: print('cellwise')
@@ -92,14 +93,26 @@ if __name__ == '__main__':
     # print(temp)
     # print(backtracking(temp))
     # print(temp)
-
+    human_time = Timer('Human Time')
+    backtrack_time = Timer('Backtrack Time')
     for test in tests:
         temp = Sudoku(test)
-        print(human_first_backtracking(temp))
-        # print(backtracking(temp))
-        print(temp)
+        human_time.start()
+        human_first_backtracking(temp)
+        human_time.stop()
+        # print(temp)
+
+        temp = Sudoku(test)
+        backtrack_time.start()
+        backtracking(temp)
+        backtrack_time.stop()
+        
+        # print(temp)
         # cellwise(temp, test=False)
         # numberwise(temp, test=False)
         # backtracking(temp)
         # print(temp.is_completed())
         # break
+
+    human_time.summary()
+    backtrack_time.summary()

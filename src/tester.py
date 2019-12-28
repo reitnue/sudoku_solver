@@ -1,31 +1,34 @@
+import os
 import sys
 import json
 import requests
 
 from sudoku import Sudoku
-from solver import cellwise
+import solver
+from time_utils import Timer
 
-def tester_number(number, solver):
-    board = get_test_board(number)
-    # solved = get_solved_board(number)
-    game = Sudoku(board)
-    solver(game)
-    return game.is_completed()
+TEST_FILE = "../test/{}_tests.json"
+DIFFICULTIES = ['easy', 'medium', 'hard', 'random']
 
-def tester_board(board, solver):
-    game = Sudoku(board)
-    solver(game)
-    return game.is_completed()
+def tester(solvers, difficulty='easy'):
+    boards = get_test_boards(difficulty=difficulty)
+    
+    timers = [Timer(f.__name__) for f in solvers]
+    for timer, solver in zip(timers, solvers):
+        for board in boards:
+            game = Sudoku(board)
+            timer.start()
+            if not solver(game):
+                print('unsolved')
+            timer.stop()
+    for timer in timers:
+        timer.summary()
 
-def get_test_board(number):
-    with open('../test/test{:02}.json'.format(number), 'r') as test1_file:
-        test1 = json.loads(test1_file.read())
-    return test1
+    return 0
 
-def get_solved_board(number):
-    with open('../test/test{:02}_solved.json'.format(number), 'r') as test1_file:
-        test1 = json.loads(test1_file.read())
-    return test1
+def get_test_boards(difficulty='easy'):
+    with open(TEST_FILE.format(difficulty), 'r') as test:
+        return json.loads(test.read())
 
 '''
 level: easy, medium, hard, random
@@ -34,15 +37,18 @@ def get_sugoku_board(level):
     req = requests.get("https://sugoku.herokuapp.com/board?difficulty={}".format(level))
     return json.loads(req.text)['board']
 
+def generate_more_boards(num_test):
+    difficulty = ['easy', 'medium', 'hard', 'random']
+    for diff in difficulty:
+        boards = [get_sugoku_board(diff) for _ in range(num_test)]
+        if os.path.exists(TEST_FILE.format(diff)):
+            with open(TEST_FILE.format(diff), 'r') as test:
+                boards += json.loads(test.read())
+        with open(TEST_FILE.format(diff), 'w') as test:
+            test.write(json.dumps(boards))
+
 if __name__ == '__main__':
-    for num in range(1, 4):
-        print(num, tester_number(num, cellwise))
-    
-    num_test = 10
-    count = 0
-    for _ in range(num_test):
-        temp_board = get_sugoku_board('easy')
-        print(temp_board)
-        if tester_board(temp_board, cellwise):
-            count += 1
-    print(count / num_test)
+    # solvers = [solver.backtracking, solver.human_first_backtracking]
+    # tester(solvers, difficulty='hard')
+
+    generate_more_boards(20)
