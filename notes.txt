@@ -7,3 +7,10 @@ online sudoku solver and helper
 use to generate sudokus of different levels
 - https://github.com/berto/sugoku
 
+# Solvers
+[x] Human Solver then Backtrack
+[ ] Probabilistic Backtracking
+[ ] Backtracking with human solving until nothing can be done then continue backtracking
+
+# Extensions
+[ ] 16x16 and so on...

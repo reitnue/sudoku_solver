@@ -1,0 +1,4 @@
+# 20191226
+Starting this log. Have a data structure for the game and initial methods.
+
+# 20191227
