@@ -1,5 +1,14 @@
 import sys
 import time
+import statistics as stat
+import math
+
+SUMMARY = '''------------------------------
+Name               : {:30}
+Count              : {}
+Average Time       : {:.5f}s
+Standard Deviation : {:.5f}s
+------------------------------'''
 
 class Timer():
     def __init__(self, name):
@@ -24,7 +33,10 @@ class Timer():
         return 0
 
     def summary(self):
-        print("{:30} ran {} times, averageing {:.5f} seconds".format(self.name, self.count, self.total_time / self.count))
+        print(SUMMARY.format(self.name, 
+                             self.count, 
+                             self.total_time / self.count, 
+                             math.sqrt(stat.variance(self.times))))
 
 
 if __name__ == '__main__':

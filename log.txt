@@ -2,3 +2,6 @@
 Starting this log. Have a data structure for the game and initial methods.
 
 # 20191227
+Wrote a tester -> human first backtracking is doing really well over all difficulties.
+
+Hypothesized that its edge over the backtracking algo would decrease with difficulty, but i guess not. Might be because at higher difficulties a single extra number adds so much more information than before for easier difficulties.

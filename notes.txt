@@ -11,6 +11,11 @@ use to generate sudokus of different levels
 [x] Human Solver then Backtrack
 [ ] Probabilistic Backtracking
 [ ] Backtracking with human solving until nothing can be done then continue backtracking
+[ ] add priorities to cells/numbers
+
+# Testers
+[ ] variance
+[ ] run solver on each board multiple times
 
 # Extensions
 [ ] 16x16 and so on...
