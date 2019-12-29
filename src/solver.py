@@ -5,6 +5,7 @@ from time_utils import Timer
 
 def cellwise(game, test=False):
     if test: print('cellwise')
+    solves = []
     count = 0
     while True:
         if test: print('--------{}--------'.format(count))
@@ -14,17 +15,19 @@ def cellwise(game, test=False):
             for j in range(9):
                 if not game.is_filled(i, j):
                     if len(game.valid_numbers(i, j)) == 1:
-                        game.fill_number(i, j, game.valid_numbers(i, j)[0])
-                        change = True
+                        if game.fill_number(i, j, game.valid_numbers(i, j)[0]) == 0:
+                            solves.append((i, j))
+                            change = True
         if test: print(game)
         # print('-----------------')
         if not change:
             break
-    return count > 1
+    return solves
 
 def numberwise(game, test=False):
     if test: print('numberwise')
     count = 0
+    solves = []
     while True:
         if test: print('--------{}--------'.format(count))
         count += 1
@@ -35,19 +38,21 @@ def numberwise(game, test=False):
                 for number in range(1, 10):
                     pos = game.number_check(number, index, axis=ax)
                     if len(pos) == 1:
-                        game.fill_number(pos[0][0], pos[0][1], number)
-                        change = True
+                        if game.fill_number(pos[0][0], pos[0][1], number) == 0:
+                            solves.append((pos[0][0], pos[0][1]))
+                            change = True
         # squares
         for square in range(9):
             for number in range(1, 10):
                 pos = game.number_check_square(number, square)
                 if len(pos) == 1:
-                    game.fill_number(pos[0][0], pos[0][1], number)
-                    change = True
+                    if game.fill_number(pos[0][0], pos[0][1], number) == 0:
+                        solves.append((pos[0][0], pos[0][1]))
+                        change = True
         if test: print(game)
         if not change:
             break
-    return count > 1
+    return solves
 
 def backtracking(game, test=False):
     if game.is_completed():
@@ -72,7 +77,7 @@ def human_first_backtracking(game, humans, test=False):
     while True:
         change = False
         for human in humans:
-            change |= human(game, test=test)
+            change |= len(human(game, test=test)) > 0
         if not change:
             break
     return backtracking(game)
@@ -96,10 +101,36 @@ keep track of which cells were filled in remove then for backtrack
 2. keep this information in game board ->
 keep a tuple (#, level) for each level/depth of the backtracking
 '''
-def human_mixed_backtracking_1(game, test=False):
-    pass
+def human_mixed_backtracking_1(game, heuristic, test=False):
+    # heuristic
+    solved = heuristic(game, test=test)
+    if game.is_completed():
+        return True
+    for row in range(9):
+        for col in range(9):
+            if not game.is_filled(row, col):
+                for num in range(1, 10):
+                    if game.fill_number(row, col, num) == 0:
+                        if not human_mixed_backtracking_1(game, heuristic, test=test):
+                            # remove past fill ins
+                            for x, y in solved:
+                                game.remove_number(x, y)
+                            game.remove_number(row, col)
+                        else:
+                            return True
+                if not game.is_filled(row, col):
+                    for x, y in solved:
+                        game.remove_number(x, y)
+                    return False # impossible
 
-def probabilistic_backtracking(game, test=False):
+def cellwise_mixed_backtracking(game, test=False):
+    return human_mixed_backtracking_1(game, cellwise)
+
+def numberwise_mixed_backtracking(game, test=False):
+    return human_mixed_backtracking_1(game, numberwise)
+
+
+def priority_based_backtracking(game, test=False):
     pass
 
 if __name__ == '__main__':
@@ -110,8 +141,11 @@ if __name__ == '__main__':
     temp_timer = Timer('temp')
     for _ in range(50):
         temp = Sudoku(tests[0])
+        numberwise(temp)        
+        print(temp)
         temp_timer.start()
-        numberwise_cellwise_backtracking(temp)
+        # print(backtracking(temp))
+        print(human_mixed_backtracking_1(temp, numberwise, test=True))
         temp_timer.stop()
-
-    temp_timer.summary()
+        break
+    # temp_timer.summary()

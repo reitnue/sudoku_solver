@@ -51,6 +51,8 @@ if __name__ == '__main__':
     solvers = [solver.numberwise_backtracking, solver.cellwise_backtracking, 
                solver.numberwise_cellwise_backtracking, 
                solver.cellwise_numberwise_backtracking,
+               solver.cellwise_mixed_backtracking,
+               solver.numberwise_mixed_backtracking,
                solver.backtracking]
     print(sys.argv[1])
     if sys.argv[1] not in DIFFICULTIES:
