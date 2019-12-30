@@ -32,6 +32,13 @@ class Sudoku:
     def __str__(self):    
         return '\n'.join([' '.join(map(str, x)) for x in self.board])
 
+    def number_empty(self):
+        num_empty = 0
+        for row in range(9):
+            for col in range(9):
+                if not self.is_filled(row, col):
+                    num_empty += 1
+        return num_empty
     # return a list of valid numbers for a square (row, col)
     def valid_numbers(self, row, col):
         if self.board[row, col] != 0:
