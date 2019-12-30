@@ -5,6 +5,9 @@ import heapq
 from sudoku import Sudoku
 from time_utils import Timer
 
+'''
+heuristics
+'''
 def cellwise(game, test=False):
     if test: print('cellwise')
     solves = []
@@ -57,19 +60,23 @@ def numberwise(game, test=False):
     return solves
 
 def backtracking(game, test=False):
+    guesses = 0
     if game.is_completed():
-        return True
+        return True, guesses
     for row in range(9):
         for col in range(9):
             if not game.is_filled(row, col):
                 for num in range(1, 10):
                     if game.fill_number(row, col, num) == 0:
-                        if not backtracking(game): # did not work -> backtrack
+                        guesses += 1
+                        result, other_guesses = backtracking(game)
+                        guesses += other_guesses
+                        if not result: # did not work -> backtrack
                             # remove number
                             game.remove_number(row, col)
                         else:
-                            return True
-                if not game.is_filled(row, col): return False
+                            return True, guesses
+                if not game.is_filled(row, col): return False, guesses
 
 def priority_backtracking_heap(game, test=False):
     if game.is_completed():
@@ -259,8 +266,9 @@ if __name__ == '__main__':
         cellwise(temp)        
         # print(temp)
         temp_timer.start()
-        # backtracking(temp)
-        print(priority_backtracking_manual(temp))
+        # print(backtracking(temp))
+        print(numberwise_backtracking(temp))
+        # print(priority_backtracking_manual(temp))
         # print(human_mixed_backtracking(temp, numberwise, test=True))
         temp_timer.stop()
     #     break

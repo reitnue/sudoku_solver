@@ -20,7 +20,7 @@ use to generate sudokus of different levels
 
 [x] Backtracking with human solving until nothing can be done then continue backtracking
 [x] add priorities to cells/numbers - not clean, because constantly updating
-[ ] how many guesses metric
+[~] how many guesses metric
 [ ] double row - heuristic
 [ ] conditional checking heuristic after any fill ins
 
