@@ -8,3 +8,11 @@ Hypothesized that its edge over the backtracking algo would decrease with diffic
 
 # 20191229
 wrote solver to mix in human solving after guessing. I believe that as the boards are harder the better performing this method does against just heuristic then backtracking, because the resulting search space is still large and heuristics help cut them down.
+
+mixed priority becomes expensive the more levels you go in your backtracking, because of the preprocessing to sort the priorities.
+
+There might be a way to do this with a priority queue, but unsure, because the board is constantly updating.
+
+I made a big bug turns out priority is good, depending on how you implement the priority you get different results, but it's pretty solid against normal backtracking at all difficulties.
+
+Next thing would probably to work on better heuristics, number of guesses metric.

@@ -10,17 +10,18 @@ from time_utils import Timer
 TEST_FILE = "../test/{}_tests.json"
 DIFFICULTIES = ['easy', 'medium', 'hard', 'random']
 
-def tester(solvers, difficulty='easy'):
+def tester(solvers, verbose=False, difficulty='easy', trials=1):
     boards = get_test_boards(difficulty=difficulty)
     
     timers = [Timer(f.__name__) for f in solvers]
     for timer, solver in zip(timers, solvers):
         for board in boards:
-            game = Sudoku(board)
-            timer.start()
-            if not solver(game):
-                print('unsolved')
-            timer.stop()
+            for _ in range(trials):
+                game = Sudoku(board)
+                timer.start()
+                if not solver(game):
+                    print('unsolved')
+                timer.stop(verbose=verbose)
     for timer in timers:
         timer.summary()
 
@@ -51,15 +52,24 @@ if __name__ == '__main__':
     solvers = []
     # solvers.append(solver.numberwise_backtracking)
     # solvers.append(solver.cellwise_backtracking)
-    solvers.append(solver.numberwise_cellwise_backtracking)
-    solvers.append(solver.cellwise_numberwise_backtracking)
-    solvers.append(solver.numberwise_mixed_backtracking)
+
+    # solvers.append(solver.numberwise_cellwise_backtracking)
+    # solvers.append(solver.cellwise_numberwise_backtracking)
+    # solvers.append(solver.numberwise_mixed_backtracking)
     solvers.append(solver.cellwise_mixed_backtracking)
-    # solvers.append(backtracking)
+    # solvers.append(solver.numberwise_mixed_priority_backtracking)
+    solvers.append(solver.cellwise_mixed_priority_backtracking)
+
+    # solvers.append(solver.numberwise_mixed_priority_backtracking_manual)
+    solvers.append(solver.cellwise_mixed_priority_backtracking_manual)
+
+    solvers.append(solver.priority_backtracking_heap)
+    solvers.append(solver.priority_backtracking_manual)
+    # solvers.append(solver.backtracking)
 
     print(sys.argv[1])
     if sys.argv[1] not in DIFFICULTIES:
         sys.stderr.write("invalid option\n")
-    tester(solvers, difficulty=sys.argv[1])
+    tester(solvers, difficulty=sys.argv[1], verbose=False, trials=int(sys.argv[2]))
 
     # generate_more_boards(20)

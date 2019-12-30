@@ -23,14 +23,14 @@ class Timer():
         self.curr_start = time.time()
         self.count += 1
 
-    def stop(self):
+    def stop(self, verbose=False):
         if self.curr_start == 0:
             sys.stderr.write("Timer: Error: cannot stop before start\n")
             return -1
         elapsed = time.time() - self.curr_start
         self.total_time += elapsed
         self.times.append(elapsed)
-        print("{:30}: Count {:02} took {:.5f} seconds; averaging {:.5f} seconds".format(self.name, self.count, elapsed, self.total_time / self.count))
+        if verbose: print("{:30}: Count {:02} took {:.5f} seconds; averaging {:.5f} seconds".format(self.name, self.count, elapsed, self.total_time / self.count))
         return 0
 
     def summary(self):

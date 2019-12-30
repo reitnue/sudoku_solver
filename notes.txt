@@ -9,17 +9,24 @@ use to generate sudokus of different levels
 
 # Solvers
 [x] Human Solver then Backtrack
-[ ] Probabilistic Backtracking
-[ ] Backtracking with human solving until nothing can be done then continue backtracking
-[ ] add priorities to cells/numbers
+[x] priority Backtracking
+	[ ] even more - depending on the related squares and their priorities
+	[ ] start with most or least opportunity?
+
+[ ] probabilistic backtracking
+- a probability to the choice of a number in each box
+- choosing the number within the box instead of the box for the number
 [ ] cell weightings to improve guessing
+
+[x] Backtracking with human solving until nothing can be done then continue backtracking
+[x] add priorities to cells/numbers - not clean, because constantly updating
 [ ] how many guesses metric
 [ ] double row - heuristic
-[ ] conditional checking heuristic after fill ins
+[ ] conditional checking heuristic after any fill ins
 
 # Testers
-[ ] variance
-[ ] run solver on each board multiple times
+[x] variance/std dev
+[x] run solver on each board multiple times
 
 # Extensions
 [ ] 16x16 and so on...

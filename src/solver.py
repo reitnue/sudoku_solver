@@ -1,5 +1,7 @@
 import sys
 import json
+import heapq
+
 from sudoku import Sudoku
 from time_utils import Timer
 
@@ -69,6 +71,53 @@ def backtracking(game, test=False):
                             return True
                 if not game.is_filled(row, col): return False
 
+def priority_backtracking_heap(game, test=False):
+    if game.is_completed():
+        return True
+    pq = []
+    for row in range(9):
+        for col in range(9):
+            if not game.is_filled(row, col):
+                heapq.heappush(pq, (len(game.valid_numbers(row, col)), row, col))
+
+    priority, row, col = heapq.heappop(pq)
+    # print(priority)
+    for num in game.valid_numbers(row, col):
+        if game.fill_number(row, col, num) == 0:
+            if not priority_backtracking_heap(game): # did not work -> backtrack
+                # remove number
+                game.remove_number(row, col)
+            else:
+                return True
+    if not game.is_filled(row, col): return False
+
+def priority_backtracking_manual(game, test=False):
+    if game.is_completed():
+        return True
+
+    curr_row, curr_col, options = -1, -1, list(range(9))
+    for row in range(9):
+        for col in range(9):
+            if not game.is_filled(row, col):
+                possible = game.valid_numbers(row, col)
+                if len(possible) < len(options):
+                    curr_row, curr_col, options = row, col, possible
+
+    # print(priority)
+    # print(len(options))
+    for num in options:
+        if game.fill_number(curr_row, curr_col, num) == 0:
+            if not priority_backtracking_manual(game): # did not work -> backtrack
+                # remove number
+                game.remove_number(curr_row, curr_col)
+                # print(game)
+            else:
+                return True
+    if not game.is_filled(curr_row, curr_col): 
+        # print(curr_row, curr_col)
+        return False
+
+
 # order matters
 '''
 cellwise -> numberwise (fastest)
@@ -101,7 +150,7 @@ keep track of which cells were filled in remove then for backtrack
 2. keep this information in game board ->
 keep a tuple (#, level) for each level/depth of the backtracking
 '''
-def human_mixed_backtracking_1(game, heuristic, test=False):
+def human_mixed_backtracking(game, heuristic, test=False):
     # heuristic
     solved = heuristic(game, test=test)
     if game.is_completed():
@@ -111,7 +160,7 @@ def human_mixed_backtracking_1(game, heuristic, test=False):
             if not game.is_filled(row, col):
                 for num in range(1, 10):
                     if game.fill_number(row, col, num) == 0:
-                        if not human_mixed_backtracking_1(game, heuristic, test=test):
+                        if not human_mixed_backtracking(game, heuristic, test=test):
                             # remove past fill ins
                             for x, y in solved:
                                 game.remove_number(x, y)
@@ -124,14 +173,80 @@ def human_mixed_backtracking_1(game, heuristic, test=False):
                     return False # impossible
 
 def cellwise_mixed_backtracking(game, test=False):
-    return human_mixed_backtracking_1(game, cellwise)
+    return human_mixed_backtracking(game, cellwise)
 
 def numberwise_mixed_backtracking(game, test=False):
-    return human_mixed_backtracking_1(game, numberwise)
+    return human_mixed_backtracking(game, numberwise)
 
+def human_mixed_priority_backtracking(game, heuristic, test=False):
+    # heuristic
+    solved = heuristic(game, test=test)
+    if game.is_completed():
+        return True
+    pq = []
+    for row in range(9):
+        for col in range(9):
+            if not game.is_filled(row, col):
+                heapq.heappush(pq, (len(game.valid_numbers(row, col)), row, col))
+    
+    priority, row, col = heapq.heappop(pq)
+    # print(priority)
+    for num in game.valid_numbers(row, col):
+        if game.fill_number(row, col, num) == 0:
+            if not human_mixed_priority_backtracking(game, heuristic, test=test):
+                # remove past fill ins
+                for x, y in solved:
+                    game.remove_number(x, y)
+                game.remove_number(row, col)
+            else:
+                return True
+    if not game.is_filled(row, col):
+        for x, y in solved:
+            game.remove_number(x, y)
+        return False # impossible
 
-def priority_based_backtracking(game, test=False):
-    pass
+def cellwise_mixed_priority_backtracking(game, test=False):
+    return human_mixed_priority_backtracking(game, cellwise)
+
+def numberwise_mixed_priority_backtracking(game, test=False):
+    return human_mixed_priority_backtracking(game, numberwise)
+
+def human_mixed_priority_backtracking_manual(game, heuristic, test=False):
+    # heuristic
+    solved = heuristic(game, test=test)
+    if game.is_completed():
+        return True
+    
+    curr_row, curr_col, options = -1, -1, list(range(9))
+    for row in range(9):
+        for col in range(9):
+            if not game.is_filled(row, col):
+                possible = game.valid_numbers(row, col)
+                if len(possible) < len(options):
+                    curr_row, curr_col, options = row, col, possible
+
+    # print(priority)
+    # print(len(options))
+    for num in options:# print(priority)
+        if game.fill_number(curr_row, curr_col, num) == 0:
+            if not human_mixed_priority_backtracking_manual(game, heuristic, test=test):
+                # remove past fill ins
+                for x, y in solved:
+                    game.remove_number(x, y)
+                game.remove_number(curr_row, curr_col)
+            else:
+                return True
+    if not game.is_filled(curr_row, curr_col):
+        for x, y in solved:
+            game.remove_number(x, y)
+        return False # impossible
+
+def cellwise_mixed_priority_backtracking_manual(game, test=False):
+    return human_mixed_priority_backtracking_manual(game, cellwise)
+
+def numberwise_mixed_priority_backtracking_manual(game, test=False):
+    return human_mixed_priority_backtracking_manual(game, numberwise)
+
 
 if __name__ == '__main__':
     # test1
@@ -141,11 +256,12 @@ if __name__ == '__main__':
     temp_timer = Timer('temp')
     for _ in range(50):
         temp = Sudoku(tests[0])
-        numberwise(temp)        
-        print(temp)
+        cellwise(temp)        
+        # print(temp)
         temp_timer.start()
-        # print(backtracking(temp))
-        print(human_mixed_backtracking_1(temp, numberwise, test=True))
+        # backtracking(temp)
+        print(priority_backtracking_manual(temp))
+        # print(human_mixed_backtracking(temp, numberwise, test=True))
         temp_timer.stop()
-        break
-    # temp_timer.summary()
+    #     break
+    temp_timer.summary()
