@@ -21,6 +21,7 @@ use to generate sudokus of different levels
 [x] Backtracking with human solving until nothing can be done then continue backtracking
 [x] add priorities to cells/numbers - not clean, because constantly updating
 [~] how many guesses metric
+- uniform weighting of guess percentage vs. total guesses/total empty (this deweights the small number of guesses, regardless of how many empty there are)
 [ ] double row - heuristic
 [ ] conditional checking heuristic after any fill ins
 

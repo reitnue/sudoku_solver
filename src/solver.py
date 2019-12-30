@@ -79,8 +79,9 @@ def backtracking(game, test=False):
                 if not game.is_filled(row, col): return False, guesses
 
 def priority_backtracking_heap(game, test=False):
+    guesses = 0
     if game.is_completed():
-        return True
+        return True, guesses
     pq = []
     for row in range(9):
         for col in range(9):
@@ -91,16 +92,19 @@ def priority_backtracking_heap(game, test=False):
     # print(priority)
     for num in game.valid_numbers(row, col):
         if game.fill_number(row, col, num) == 0:
-            if not priority_backtracking_heap(game): # did not work -> backtrack
+            done, other_guesses = priority_backtracking_heap(game)
+            guesses += other_guesses + 1
+            if not done: # did not work -> backtrack
                 # remove number
                 game.remove_number(row, col)
             else:
-                return True
-    if not game.is_filled(row, col): return False
+                return True, guesses
+    if not game.is_filled(row, col): return False, guesses
 
 def priority_backtracking_manual(game, test=False):
+    guesses = 0
     if game.is_completed():
-        return True
+        return True, guesses
 
     curr_row, curr_col, options = -1, -1, list(range(9))
     for row in range(9):
@@ -114,15 +118,17 @@ def priority_backtracking_manual(game, test=False):
     # print(len(options))
     for num in options:
         if game.fill_number(curr_row, curr_col, num) == 0:
-            if not priority_backtracking_manual(game): # did not work -> backtrack
+            done, other_guesses = priority_backtracking_manual(game)
+            guesses += other_guesses + 1
+            if not done: # did not work -> backtrack
                 # remove number
                 game.remove_number(curr_row, curr_col)
                 # print(game)
             else:
-                return True
+                return True, guesses
     if not game.is_filled(curr_row, curr_col): 
         # print(curr_row, curr_col)
-        return False
+        return False, guesses
 
 
 # order matters
@@ -226,9 +232,10 @@ def numberwise_mixed_priority_backtracking(game, test=False):
 
 def human_mixed_priority_backtracking_manual(game, heuristic, test=False):
     # heuristic
+    guesses = 0
     solved = heuristic(game, test=test)
     if game.is_completed():
-        return True
+        return True, guesses
     
     curr_row, curr_col, options = -1, -1, list(range(9))
     for row in range(9):
@@ -242,17 +249,19 @@ def human_mixed_priority_backtracking_manual(game, heuristic, test=False):
     # print(len(options))
     for num in options:# print(priority)
         if game.fill_number(curr_row, curr_col, num) == 0:
-            if not human_mixed_priority_backtracking_manual(game, heuristic, test=test):
+            done, other_guesses = human_mixed_priority_backtracking_manual(game, heuristic, test=test)
+            guesses += other_guesses + 1
+            if not done:
                 # remove past fill ins
                 for x, y in solved:
                     game.remove_number(x, y)
                 game.remove_number(curr_row, curr_col)
             else:
-                return True
+                return True, guesses
     if not game.is_filled(curr_row, curr_col):
         for x, y in solved:
             game.remove_number(x, y)
-        return False # impossible
+        return False, guesses # impossible
 
 def cellwise_mixed_priority_backtracking_manual(game, test=False):
     return human_mixed_priority_backtracking_manual(game, cellwise)

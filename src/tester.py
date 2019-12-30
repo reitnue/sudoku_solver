@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import requests
+import statistics as stat
 
 from sudoku import Sudoku
 import solver
@@ -15,13 +16,19 @@ def tester(solvers, verbose=False, difficulty='easy', trials=1):
     
     timers = [Timer(f.__name__) for f in solvers]
     for timer, solver in zip(timers, solvers):
+        solver_guesses = []
         for board in boards:
             for _ in range(trials):
                 game = Sudoku(board)
+                empty = game.number_empty()
                 timer.start()
-                if not solver(game):
+                done, guesses = solver(game)
+                if not done:
                     print('unsolved')
+                else:
+                    solver_guesses.append(guesses)
                 timer.stop(verbose=verbose)
+        print("{:50}: Avg Number of Guess: {:.5f}".format(solver.__name__, stat.mean(solver_guesses)))
     for timer in timers:
         timer.summary()
 
