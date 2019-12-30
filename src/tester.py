@@ -48,12 +48,15 @@ def generate_more_boards(num_test):
             test.write(json.dumps(boards))
 
 if __name__ == '__main__':
-    solvers = [solver.numberwise_backtracking, solver.cellwise_backtracking, 
-               solver.numberwise_cellwise_backtracking, 
-               solver.cellwise_numberwise_backtracking,
-               solver.cellwise_mixed_backtracking,
-               solver.numberwise_mixed_backtracking,
-               solver.backtracking]
+    solvers = []
+    # solvers.append(solver.numberwise_backtracking)
+    # solvers.append(solver.cellwise_backtracking)
+    solvers.append(solver.numberwise_cellwise_backtracking)
+    solvers.append(solver.cellwise_numberwise_backtracking)
+    solvers.append(solver.numberwise_mixed_backtracking)
+    solvers.append(solver.cellwise_mixed_backtracking)
+    # solvers.append(backtracking)
+
     print(sys.argv[1])
     if sys.argv[1] not in DIFFICULTIES:
         sys.stderr.write("invalid option\n")
