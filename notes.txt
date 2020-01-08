@@ -12,6 +12,8 @@ use to generate sudokus of different levels
 [x] priority Backtracking
 	[ ] even more - depending on the related squares and their priorities
 	[ ] start with most or least opportunity?
+	[ ] random
+[x] random backtracking
 
 [ ] probabilistic backtracking
 - a probability to the choice of a number in each box

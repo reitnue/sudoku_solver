@@ -26,9 +26,9 @@ def tester(solvers, verbose=False, difficulty='easy', trials=1):
                 if not done:
                     print('unsolved')
                 else:
-                    solver_guesses.append(guesses)
+                    solver_guesses.append(guesses / empty)
                 timer.stop(verbose=verbose)
-        print("{:50}: Avg Number of Guess: {:.5f}".format(solver.__name__, stat.mean(solver_guesses)))
+        print("{:50}: Avg Number of Percentage Guess: {:.5f}".format(solver.__name__, stat.mean(solver_guesses)))
     for timer in timers:
         timer.summary()
 
@@ -63,16 +63,17 @@ if __name__ == '__main__':
     # solvers.append(solver.numberwise_cellwise_backtracking)
     # solvers.append(solver.cellwise_numberwise_backtracking)
     # solvers.append(solver.numberwise_mixed_backtracking)
-    solvers.append(solver.cellwise_mixed_backtracking)
-    # solvers.append(solver.numberwise_mixed_priority_backtracking)
-    solvers.append(solver.cellwise_mixed_priority_backtracking)
+    # solvers.append(solver.cellwise_mixed_backtracking)
+    # solvers.append(solver.numberwise_mixed_priority_backtracking_heap)
+    solvers.append(solver.cellwise_mixed_priority_backtracking_heap)
 
     # solvers.append(solver.numberwise_mixed_priority_backtracking_manual)
     solvers.append(solver.cellwise_mixed_priority_backtracking_manual)
 
     solvers.append(solver.priority_backtracking_heap)
     solvers.append(solver.priority_backtracking_manual)
-    # solvers.append(solver.backtracking)
+    solvers.append(solver.backtracking)
+    # solvers.append(solver.random_backtracking)
 
     print(sys.argv[1])
     if sys.argv[1] not in DIFFICULTIES:

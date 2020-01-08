@@ -1,6 +1,7 @@
 import sys
 import json
 import heapq
+import random
 
 from sudoku import Sudoku
 from time_utils import Timer
@@ -78,6 +79,36 @@ def backtracking(game, test=False):
                             return True, guesses
                 if not game.is_filled(row, col): return False, guesses
 
+def random_backtracking(game, test=False):
+    guesses = 0
+    if test:
+        print('-' * 17)
+        print(game)
+    if game.is_completed():
+        return True, guesses
+    open_squares = []
+    for open_row in range(9):
+        for open_col in range(9):
+            if not game.is_filled(open_row, open_col):
+                open_squares.append((open_row, open_col))
+    random.shuffle(open_squares)
+    # print(open_squares)
+    nums = list(range(1, 10))
+    random.shuffle(nums)
+    for row, col in open_squares:
+        if test: print(row, col)
+        for num in nums:
+            if game.fill_number(row, col, num) == 0:
+                guesses += 1
+                result, other_guesses = random_backtracking(game, test=test)
+                guesses += other_guesses
+                if not result: # did not work -> backtrack
+                    # remove number
+                    game.remove_number(row, col)
+                else:
+                    return True, guesses
+        if not game.is_filled(row, col): return False, guesses
+
 def priority_backtracking_heap(game, test=False):
     guesses = 0
     if game.is_completed():
@@ -129,7 +160,6 @@ def priority_backtracking_manual(game, test=False):
     if not game.is_filled(curr_row, curr_col): 
         # print(curr_row, curr_col)
         return False, guesses
-
 
 # order matters
 '''
@@ -194,7 +224,7 @@ def cellwise_mixed_backtracking(game, test=False):
 def numberwise_mixed_backtracking(game, test=False):
     return human_mixed_backtracking(game, numberwise)
 
-def human_mixed_priority_backtracking(game, heuristic, test=False):
+def human_mixed_priority_backtracking_heap(game, heuristic, test=False):
     # heuristic
     guesses = 0
     solved = heuristic(game, test=test)
@@ -210,7 +240,7 @@ def human_mixed_priority_backtracking(game, heuristic, test=False):
     # print(priority)
     for num in game.valid_numbers(row, col):
         if game.fill_number(row, col, num) == 0:
-            done, other_guesses = human_mixed_priority_backtracking(game, heuristic, test=test)
+            done, other_guesses = human_mixed_priority_backtracking_heap(game, heuristic, test=test)
             guesses += other_guesses + 1
             if not done:
                 # remove past fill ins
@@ -224,11 +254,11 @@ def human_mixed_priority_backtracking(game, heuristic, test=False):
             game.remove_number(x, y)
         return False, guesses # impossible
 
-def cellwise_mixed_priority_backtracking(game, test=False):
-    return human_mixed_priority_backtracking(game, cellwise)
+def cellwise_mixed_priority_backtracking_heap(game, test=False):
+    return human_mixed_priority_backtracking_heap(game, cellwise)
 
-def numberwise_mixed_priority_backtracking(game, test=False):
-    return human_mixed_priority_backtracking(game, numberwise)
+def numberwise_mixed_priority_backtracking_heap(game, test=False):
+    return human_mixed_priority_backtracking_heap(game, numberwise)
 
 def human_mixed_priority_backtracking_manual(game, heuristic, test=False):
     # heuristic
@@ -275,19 +305,34 @@ if __name__ == '__main__':
     with open('../test/easy_tests.json', 'r') as test_file:
         tests = json.loads(test_file.read())
     
+    game = [[8,0,0,5,7,4,3,1,2],
+            [0,5,4,0,0,0,8,7,6],
+            [0,3,0,0,0,0,4,5,9],
+            [6,8,3,1,9,5,2,4,7],
+            [4,0,0,3,8,2,1,6,5],
+            [5,1,2,7,4,6,9,8,3],
+            [0,4,0,0,0,0,5,2,1],
+            [0,0,0,4,5,0,0,9,8],
+            [0,0,5,0,1,0,0,3,4]]
     temp_timer = Timer('temp')
-    for _ in range(50):
-        temp = Sudoku(tests[0])
+
+    for _ in range(10):
+        temp = Sudoku(tests[2])
         # cellwise(temp)
         # print(temp)
         num_empty = temp.number_empty()
         temp_timer.start()
+        # print(temp)
+        done, guesses = random_backtracking(temp, test=False)
+        print(guesses)
+        # print(temp)
         # print(backtracking(temp))
         # print(numberwise_backtracking(temp))
         # print(priority_backtracking_manual(temp))
         # done, guesses = human_mixed_backtracking(temp, numberwise, test=False)
-        done, guesses = human_mixed_priority_backtracking(temp, numberwise, test=False)
-        print(guesses / num_empty)
+        # done, guesses = human_mixed_priority_backtracking_manual(temp, numberwise, test=False)
+        # print(guesses / num_empty)
         temp_timer.stop()
+        # break
     #     break
     temp_timer.summary()

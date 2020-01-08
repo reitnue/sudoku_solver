@@ -1,10 +1,7 @@
-# 20191226
-Starting this log. Have a data structure for the game and initial methods.
+# 20190108
+Random backtracking doesn't work that well... sometimes it doesn't even finish!. I think when compared to backtracking, there is a certain relationship between consecutive guesses, because we are doing down the row. However with random backtracking we arbitrarily pick open squares, this it's more likely that the next square we pick has nothing to do with the previous one we guessed, therefore making us need to guess more. This method does nothing to help cut down the search tree.
 
-# 20191227
-Wrote a tester -> human first backtracking is doing really well over all difficulties.
-
-Hypothesized that its edge over the backtracking algo would decrease with difficulty, but i guess not. Might be because at higher difficulties a single extra number adds so much more information than before for easier difficulties.
+It is likely that when combined with other methods there can be more success.
 
 # 20191229
 wrote solver to mix in human solving after guessing. I believe that as the boards are harder the better performing this method does against just heuristic then backtracking, because the resulting search space is still large and heuristics help cut them down.
@@ -16,3 +13,11 @@ There might be a way to do this with a priority queue, but unsure, because the b
 I made a big bug turns out priority is good, depending on how you implement the priority you get different results, but it's pretty solid against normal backtracking at all difficulties.
 
 Next thing would probably to work on better heuristics, number of guesses metric.
+
+# 20191227
+Wrote a tester -> human first backtracking is doing really well over all difficulties.
+
+Hypothesized that its edge over the backtracking algo would decrease with difficulty, but i guess not. Might be because at higher difficulties a single extra number adds so much more information than before for easier difficulties.
+
+# 20191226
+Starting this log. Have a data structure for the game and initial methods.
