@@ -161,6 +161,42 @@ def priority_backtracking_manual(game, test=False):
         # print(curr_row, curr_col)
         return False, guesses
 
+def random_priority_backtracking_manual(game, test=False, randomized=True):
+    guesses = 0
+    if game.is_completed():
+        return True, guesses
+
+    option_dict = {}
+    curr_row, curr_col, options = -1, -1, list(range(9))
+    for row in range(9):
+        for col in range(9):
+            if not game.is_filled(row, col):
+                possible = game.valid_numbers(row, col)
+                if len(possible) not in option_dict:
+                    option_dict[len(possible)] = []
+                option_dict[len(possible)].append((row, col, possible))
+
+                if len(possible) < len(options):
+                    curr_row, curr_col, options = row, col, possible
+
+    # print(priority)
+    # print(len(options))
+    if randomized:
+        curr_row, curr_col, options = random.choice(option_dict[sorted(option_dict.keys())[0]])
+    for num in options:
+        if game.fill_number(curr_row, curr_col, num) == 0:
+            done, other_guesses = random_priority_backtracking_manual(game)
+            guesses += other_guesses + 1
+            if not done: # did not work -> backtrack
+                # remove number
+                game.remove_number(curr_row, curr_col)
+                # print(game)
+            else:
+                return True, guesses
+    if not game.is_filled(curr_row, curr_col): 
+        # print(curr_row, curr_col)
+        return False, guesses
+
 # order matters
 '''
 cellwise -> numberwise (fastest)
@@ -299,6 +335,52 @@ def cellwise_mixed_priority_backtracking_manual(game, test=False):
 def numberwise_mixed_priority_backtracking_manual(game, test=False):
     return human_mixed_priority_backtracking_manual(game, numberwise)
 
+def random_human_mixed_priority_backtracking_manual(game, heuristic, test=False, randomized=True):
+    # heuristic
+    guesses = 0
+    solved = heuristic(game, test=test)
+    if game.is_completed():
+        return True, guesses
+    
+    option_dict = {}
+    curr_row, curr_col, options = -1, -1, list(range(9))
+    for row in range(9):
+        for col in range(9):
+            if not game.is_filled(row, col):
+                possible = game.valid_numbers(row, col)
+                if len(possible) not in option_dict:
+                    option_dict[len(possible)] = []
+                option_dict[len(possible)].append((row, col, possible))
+
+                if len(possible) < len(options):
+                    curr_row, curr_col, options = row, col, possible
+
+    # print(priority)
+    # print(len(options))
+    if randomized:
+        curr_row, curr_col, options = random.choice(option_dict[sorted(option_dict.keys())[0]])
+    for num in options:# print(priority)
+        if game.fill_number(curr_row, curr_col, num) == 0:
+            done, other_guesses = human_mixed_priority_backtracking_manual(game, heuristic, test=test)
+            guesses += other_guesses + 1
+            if not done:
+                # remove past fill ins
+                for x, y in solved:
+                    game.remove_number(x, y)
+                game.remove_number(curr_row, curr_col)
+            else:
+                return True, guesses
+    if not game.is_filled(curr_row, curr_col):
+        for x, y in solved:
+            game.remove_number(x, y)
+        return False, guesses # impossible
+
+def random_cellwise_mixed_priority_backtracking_manual(game, test=False):
+    return random_human_mixed_priority_backtracking_manual(game, cellwise)
+
+# same as cellwise_mixed_priority_backtracking_manual, but with option_dict
+def not_random_cellwise_mixed_priority_backtracking_manual(game, test=False):
+    return random_human_mixed_priority_backtracking_manual(game, cellwise, randomized=False)
 
 if __name__ == '__main__':
     # test1
@@ -322,8 +404,8 @@ if __name__ == '__main__':
         # print(temp)
         num_empty = temp.number_empty()
         temp_timer.start()
-        # print(temp)
-        done, guesses = random_backtracking(temp, test=False)
+        print(temp)
+        done, guesses = random_priority_backtracking_manual(temp, test=False)
         print(guesses)
         # print(temp)
         # print(backtracking(temp))

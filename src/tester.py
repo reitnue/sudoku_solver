@@ -69,10 +69,13 @@ if __name__ == '__main__':
 
     # solvers.append(solver.numberwise_mixed_priority_backtracking_manual)
     solvers.append(solver.cellwise_mixed_priority_backtracking_manual)
+    solvers.append(solver.not_random_cellwise_mixed_priority_backtracking_manual)
+    solvers.append(solver.random_cellwise_mixed_priority_backtracking_manual)
 
-    solvers.append(solver.priority_backtracking_heap)
+    # solvers.append(solver.priority_backtracking_heap)
     solvers.append(solver.priority_backtracking_manual)
-    solvers.append(solver.backtracking)
+    solvers.append(solver.random_priority_backtracking_manual)
+    # solvers.append(solver.backtracking)
     # solvers.append(solver.random_backtracking)
 
     print(sys.argv[1])
