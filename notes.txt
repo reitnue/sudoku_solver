@@ -30,7 +30,8 @@ use to generate sudokus of different levels
 # Testers
 [x] variance/std dev
 [x] run solver on each board multiple times
-[ ] t test
+[~] t test
+	not terribly efficient for close solvers
 
 # Extensions
 [ ] 16x16 and so on...

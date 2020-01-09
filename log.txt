@@ -3,6 +3,8 @@ Random backtracking doesn't work that well... sometimes it doesn't even finish!.
 
 It is likely that when combined with other methods there can be more success.
 
+paired t-test done, but it's not super good for really close solvers.
+
 # 20191229
 wrote solver to mix in human solving after guessing. I believe that as the boards are harder the better performing this method does against just heuristic then backtracking, because the resulting search space is still large and heuristics help cut them down.
 

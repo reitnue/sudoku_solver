@@ -3,6 +3,7 @@ import sys
 import json
 import requests
 import statistics as stat
+from scipy import stats as sci_stats
 
 from sudoku import Sudoku
 import solver
@@ -23,14 +24,43 @@ def tester(solvers, verbose=False, difficulty='easy', trials=1):
                 empty = game.number_empty()
                 timer.start()
                 done, guesses = solver(game)
+                timer.stop(verbose=verbose)
                 if not done:
                     print('unsolved')
                 else:
                     solver_guesses.append(guesses / empty)
-                timer.stop(verbose=verbose)
         print("{:50}: Avg Number of Percentage Guess: {:.5f}".format(solver.__name__, stat.mean(solver_guesses)))
     for timer in timers:
         timer.summary()
+
+    return 0
+
+def t_tester(solver_a, solver_b, verbose=False, difficulty='easy', trials=10):
+    board = get_sugoku_board(difficulty)
+    
+    solvers = [solver_a, solver_b]
+    timers = [Timer(f.__name__) for f in solvers]
+    
+    for timer, solver in zip(timers, solvers):
+        solver_guesses = []
+        for _ in range(trials):
+            game = Sudoku(board)
+            empty = game.number_empty()
+            
+            timer.start()
+            done, guesses = solver(game)
+            timer.stop(verbose=verbose)
+            
+            if not done:
+                print('unsolved')
+            else:
+                solver_guesses.append(guesses / empty)
+        print("{:50}: Avg Number of Percentage Guess: {:.5f}".format(solver.__name__, stat.mean(solver_guesses)))
+    
+    for timer in timers:
+        timer.summary()
+
+    print(sci_stats.ttest_rel(timers[0].times, timers[1].times))
 
     return 0
 
@@ -78,9 +108,10 @@ if __name__ == '__main__':
     # solvers.append(solver.backtracking)
     # solvers.append(solver.random_backtracking)
 
-    print(sys.argv[1])
-    if sys.argv[1] not in DIFFICULTIES:
-        sys.stderr.write("invalid option\n")
-    tester(solvers, difficulty=sys.argv[1], verbose=False, trials=int(sys.argv[2]))
+    # print(sys.argv[1])
+    # if sys.argv[1] not in DIFFICULTIES:
+    #     sys.stderr.write("invalid option\n")
+    # tester(solvers, difficulty=sys.argv[1], verbose=False, trials=int(sys.argv[2]))
 
-    # generate_more_boards(20)
+    t_tester(solver.cellwise_mixed_priority_backtracking_manual, solver.random_priority_backtracking_manual)
+    t_tester(solver.random_priority_backtracking_manual, solver.cellwise_mixed_priority_backtracking_manual)
