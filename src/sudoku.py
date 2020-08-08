@@ -6,17 +6,26 @@ INDICES = [0, 3, 6]
 NUMBERS = [x for x in range(1, 10)]
 # NUMBERS_SET = set(NUMBERS)
 
-def compute_square(row, col):
+'''
+row and col are 0-indexed
+'''
+
+def compute_square(row: int, col: int) -> int:
+    '''
+    Given (row, col) returns the corresponding
+    square number on the sudoku board
+    '''
     return ((row // 3) * 3) + (col // 3)
 
-def compute_row_col(square):
+def compute_row_col(square: int) -> (int, int):
+    '''
+    Given square number on the sudoku board
+    Returns the (row, col) pair
+    '''
     row = 3 * (square // 3)
     col = 3 * (square % 3)
     return row, col
-'''
-row, col are both zero-indexed
-assumes all boards are valid
-'''
+
 class Sudoku:
     def __init__(self, board=None):
         self.board   = np.array(board) # 2d array
@@ -86,10 +95,10 @@ class Sudoku:
         valid_pos = []
         for jndex in range(9):
             if axis == 0:
-                if not self.is_filled(index, jndex):
+                if not self.is_filled(index, jndex) and number in self.valid_numbers(index, jndex):
                     valid_pos.append((index, jndex))
             elif axis == 1:
-                if not self.is_filled(jndex, index):
+                if not self.is_filled(jndex, index) and number in self.valid_numbers(jndex, index):
                     valid_pos.append((jndex, index))
 
         return valid_pos
