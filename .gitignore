@@ -2,3 +2,4 @@
 *.pyo
 temp*
 *.json
+notebooks/.ipynb_checkpoints
