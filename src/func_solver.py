@@ -1,7 +1,7 @@
 import sys
 import json
 import heapq
-import random
+import random as rand
 
 import src.func_sudoku as func_sudoku
 from src.sudoku import Sudoku
@@ -63,8 +63,9 @@ def numberwise(game, test=False):
             break
     return game, solves
 
+import copy
 def backtracking(game, test=False):
-    game = game.copy()
+    game = copy.deepcopy(game) 
     if func_sudoku.is_completed(game):
         return True, game 
     for row in range(9):
@@ -120,15 +121,16 @@ def random_backtracking(game, test=False):
         if game['board'][row, col] == 0:
             return False, game
 
-def priority_backtracking_heap(game, test=False):
-    game = game.copy()
+def priority_backtracking_heap(game, random=False, test=False):
+    game = copy.deepcopy(game)
     if func_sudoku.is_completed(game):
         return True, game
     pq = []
     for row in range(9):
         for col in range(9):
             if game['board'][row, col] == 0:
-                heapq.heappush(pq, (len(func_sudoku.valid_numbers(game, row, col)), row, col))
+                weight = rand.random()/2
+                heapq.heappush(pq, (len(func_sudoku.valid_numbers(game, row, col))+weight, row, col))
 
     priority, row, col = heapq.heappop(pq)
     # print(priority)
@@ -145,6 +147,9 @@ def priority_backtracking_heap(game, test=False):
         return False, game
 
 def priority_backtracking_manual(game, test=False):
+    '''
+    only difference is possible time?
+    '''
     guesses = 0
     if game.is_completed():
         return True, guesses
