@@ -2,7 +2,8 @@ import sys
 import json
 import heapq
 import random
-sys.path.append('.')
+
+import src.func_sudoku as func_sudoku
 from src.sudoku import Sudoku
 from src.time_utils import Timer
 
@@ -10,6 +11,7 @@ from src.time_utils import Timer
 heuristics
 '''
 def cellwise(game, test=False):
+    game = game.copy()
     if test: print('cellwise')
     solves = []
     count = 0
@@ -19,18 +21,19 @@ def cellwise(game, test=False):
         change = False
         for i in range(9):
             for j in range(9):
-                if not game.is_filled(i, j):
-                    if len(game.valid_numbers(i, j)) == 1:
-                        if game.fill_number(i, j, game.valid_numbers(i, j)[0]) == 0:
-                            solves.append((i, j))
-                            change = True
+                if game['board'][i, j] == 0:
+                    if len(func_sudoku.valid_numbers(game, i, j)) == 1:
+                        game = func_sudoku.fill_number(game, i, j, func_sudoku.valid_numbers(game, i, j)[0])
+                        solves.append((i, j))
+                        change = True
         if test: print(game)
         # print('-----------------')
         if not change:
             break
-    return solves
+    return game, solves
 
 def numberwise(game, test=False):
+    game = game.copy()
     if test: print('numberwise')
     count = 0
     solves = []
@@ -42,95 +45,104 @@ def numberwise(game, test=False):
         for ax in range(2):
             for index in range(9):
                 for number in range(1, 10):
-                    pos = game.number_check(number, index, axis=ax)
+                    pos = func_sudoku.valid_positions(game, number, index, axis=ax)
                     if len(pos) == 1:
-                        if game.fill_number(pos[0][0], pos[0][1], number) == 0:
-                            solves.append((pos[0][0], pos[0][1]))
-                            change = True
+                        game = func_sudoku.fill_number(game, pos[0][0], pos[0][1], number)
+                        solves.append((pos[0][0], pos[0][1]))
+                        change = True
         # squares
         for square in range(9):
             for number in range(1, 10):
-                pos = game.number_check_square(number, square)
+                pos = func_sudoku.valid_positions_square(game, number, square)
                 if len(pos) == 1:
-                    if game.fill_number(pos[0][0], pos[0][1], number) == 0:
-                        solves.append((pos[0][0], pos[0][1]))
-                        change = True
+                    game = func_sudoku.fill_number(game, pos[0][0], pos[0][1], number)
+                    solves.append((pos[0][0], pos[0][1]))
+                    change = True
         if test: print(game)
         if not change:
             break
-    return solves
+    return game, solves
 
 def backtracking(game, test=False):
-    guesses = 0
-    if game.is_completed():
-        return True, guesses
+    game = game.copy()
+    if func_sudoku.is_completed(game):
+        return True, game 
     for row in range(9):
         for col in range(9):
-            if not game.is_filled(row, col):
+            if game['board'][row, col] == 0:
                 for num in range(1, 10):
-                    if game.fill_number(row, col, num) == 0:
-                        guesses += 1
-                        result, other_guesses = backtracking(game)
-                        guesses += other_guesses
-                        if not result: # did not work -> backtrack
-                            # remove number
-                            game.remove_number(row, col)
-                        else:
-                            return True, guesses
-                if not game.is_filled(row, col): return False, guesses
+                    if num not in func_sudoku.valid_numbers(game, row, col):
+                        continue
+                    game = func_sudoku.fill_number(game, row, col, num)
+                    game['guesses'] += 1
+                    result, game = backtracking(game)
+                    if not result: # did not work -> backtrack
+                        # remove number
+                        game = func_sudoku.remove_number(game, row, col)
+                    else:
+                        return True, game 
+                if game['board'][row, col] == 0:
+                    return False, game 
+
 
 def random_backtracking(game, test=False):
-    guesses = 0
+    '''
+    likely doesn't work, because randomly choosing start ponts does not
+    limit the subsequent choices in a meaningful way
+    '''
+    game = game.copy()
     if test:
         print('-' * 17)
         print(game)
-    if game.is_completed():
-        return True, guesses
+    if func_sudoku.is_completed(game):
+        return True, game 
     open_squares = []
     for open_row in range(9):
         for open_col in range(9):
-            if not game.is_filled(open_row, open_col):
+            if game['board'][open_row, open_col] == 0:
                 open_squares.append((open_row, open_col))
     random.shuffle(open_squares)
-    # print(open_squares)
     nums = list(range(1, 10))
     random.shuffle(nums)
-    for row, col in open_squares[::-1]:
+    for row, col in open_squares:
         if test: print(row, col)
         for num in nums:
-            if game.fill_number(row, col, num) == 0:
-                guesses += 1
-                result, other_guesses = random_backtracking(game, test=test)
-                guesses += other_guesses
-                if not result: # did not work -> backtrack
-                    # remove number
-                    game.remove_number(row, col)
-                else:
-                    return True, guesses
-        if not game.is_filled(row, col): return False, guesses
+            if num not in func_sudoku.valid_numbers(game, row, col):
+                continue
+            game = func_sudoku.fill_number(game, row, col, num)
+            game['guesses'] += 1
+            result, game = random_backtracking(game, test=test)
+            if not result: # did not work -> backtrack
+                # remove number
+                game = func_sudoku.remove_number(game, row, col)
+            else:
+                return True, game 
+        if game['board'][row, col] == 0:
+            return False, game
 
 def priority_backtracking_heap(game, test=False):
-    guesses = 0
-    if game.is_completed():
-        return True, guesses
+    game = game.copy()
+    if func_sudoku.is_completed(game):
+        return True, game
     pq = []
     for row in range(9):
         for col in range(9):
-            if not game.is_filled(row, col):
-                heapq.heappush(pq, (len(game.valid_numbers(row, col)), row, col))
+            if game['board'][row, col] == 0:
+                heapq.heappush(pq, (len(func_sudoku.valid_numbers(game, row, col)), row, col))
 
     priority, row, col = heapq.heappop(pq)
     # print(priority)
-    for num in game.valid_numbers(row, col):
-        if game.fill_number(row, col, num) == 0:
-            done, other_guesses = priority_backtracking_heap(game)
-            guesses += other_guesses + 1
-            if not done: # did not work -> backtrack
-                # remove number
-                game.remove_number(row, col)
-            else:
-                return True, guesses
-    if not game.is_filled(row, col): return False, guesses
+    for num in func_sudoku.valid_numbers(game, row, col):
+        func_sudoku.fill_number(game, row, col, num)
+        game['guesses'] += 1
+        done, game = priority_backtracking_heap(game)
+        if not done: # did not work -> backtrack
+            # remove number
+            func_sudoku.remove_number(game, row, col)
+        else:
+            return True, game
+    if game['board'][row, col] == 0:
+        return False, game
 
 def priority_backtracking_manual(game, test=False):
     guesses = 0
@@ -405,8 +417,7 @@ if __name__ == '__main__':
         num_empty = temp.number_empty()
         temp_timer.start()
         print(temp)
-        done, guesses = random_backtracking(temp, test=True)
-        # done, guesses = random_priority_backtracking_manual(temp, test=False)
+        done, guesses = random_priority_backtracking_manual(temp, test=False)
         print(guesses)
         print(temp)
         # print(backtracking(temp))

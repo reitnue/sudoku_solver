@@ -1,6 +1,7 @@
 import pytest
 from src import sudoku
 from src import func_sudoku
+from src import solver, func_solver
 
 easy_board = [
     [0, 5, 8, 0, 0, 0, 0, 0, 0],
@@ -61,16 +62,16 @@ def test_creation(class_board, func_board):
     '''
     tests creation and initialization of boards
     '''
-    is_equal_boards(class_board, func_board)
+    assert is_equal_boards(class_board, func_board)
 
 def is_equal_boards(board_class, board_func):
     for key in ['board', 'rows', 'cols', 'squares']:
         a = getattr(board_class, key)
         b = board_func[key]
         if key == 'board':
-            assert (a == b).all()
+            return (a == b).all()
         else:
-            assert a == b
+            return a == b
 
 def test_print(class_board, func_board):
     '''
@@ -102,7 +103,7 @@ def test_valid_fill_number(class_board, func_board):
     '''
     class_board.fill_number(0, 0, 7)
     next_board = func_sudoku.fill_number(func_board, 0, 0, 7)
-    is_equal_boards(class_board, next_board)
+    assert is_equal_boards(class_board, next_board)
 
 
 def test_invalid_fill_number(class_board, func_board):
@@ -112,7 +113,7 @@ def test_invalid_fill_number(class_board, func_board):
     number = 5
     class_board.fill_number(0, 0, number)
     next_board = func_sudoku.fill_number(func_board, 0, 0, number)
-    is_equal_boards(class_board, next_board)
+    assert is_equal_boards(class_board, next_board)
 
 
 def test_valid_remove_number(class_board, func_board):
@@ -121,16 +122,15 @@ def test_valid_remove_number(class_board, func_board):
     '''
     class_board.remove_number(0, 1)
     next_board = func_sudoku.remove_number(func_board, 0, 1)
-    is_equal_boards(class_board, next_board)
+    assert is_equal_boards(class_board, next_board)
 
 
+@pytest.mark.skip('not implemented')
 def test_invalid_remove_number(class_board, func_board):
     '''
     tests both methods fails to removes number and does nothing
     - not implemented in class
     '''
-    assert True
-    return
     class_board.remove_number(0, 0)
     next_board = func_sudoku.remove_number(func_board, 0, 0)
     is_equal_boards(class_board, next_board)
@@ -163,3 +163,54 @@ def test_valid_positions_square(class_board, func_board):
         for num in range(1, 10):
             assert sorted(class_board.number_check_square(num, square)) == \
                 sorted(func_sudoku.valid_positions_square(func_board, num, square))
+
+
+def test_cellwise(class_board, func_board):
+    '''
+    tests cellwise heuristic
+    '''
+    next_board, solves = func_solver.cellwise(func_board)
+    assert sorted(solver.cellwise(class_board)) == \
+        sorted(solves)
+    assert is_equal_boards(class_board, next_board)
+
+
+def test_numberwise(class_board, func_board):
+    '''
+    tests numberwise heuristic
+    '''
+    next_board, solves = func_solver.numberwise(func_board)
+    assert sorted(solver.numberwise(class_board)) == \
+        sorted(solves)
+    assert is_equal_boards(class_board, next_board)
+
+
+def test_backtracking(class_board, func_board):
+    '''
+    tests backtracking solver
+    '''
+    _, guesses = solver.backtracking(class_board)
+    is_complete, func_board = func_solver.backtracking(func_board)
+    assert is_complete
+    assert is_equal_boards(class_board, func_board)
+    assert guesses == func_board['guesses']
+
+
+@pytest.mark.skip("bad solver method")
+def test_random_backtracking(class_board, func_board):
+    '''
+    tests random backtracking solver
+    '''
+    _, guesses = solver.random_backtracking(class_board)
+    is_complete, func_board = func_solver.random_backtracking(func_board)
+    assert is_complete
+    assert is_equal_boards(class_board, func_board)
+
+
+def test_priority_backtracking_heap(class_board, func_board):
+    _, guesses = solver.priority_backtracking_heap(class_board)
+    is_complete, func_board = func_solver.priority_backtracking_heap(func_board)
+    assert is_complete
+    assert is_equal_boards(class_board, func_board)
+    assert guesses == func_board['guesses']
+

@@ -31,6 +31,7 @@ def compute_row_col(square: int) -> (int, int):
 
 def create_sudoku(board: List[List[int]]) -> Dict:
     result = {}
+    result['guesses'] = 0
     result['board'] = np.array(board) # 2d array
     result['rows'] = [set(filter((lambda x: x != 0), row)) for row in result['board']]
     result['cols'] = [set(filter((lambda x: x != 0), col)) for col in result['board'].T]

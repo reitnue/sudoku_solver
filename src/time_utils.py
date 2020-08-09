@@ -47,3 +47,4 @@ if __name__ == '__main__':
         temp.start()
         time.sleep(0.5)
         temp.stop()
+    temp.summary()
