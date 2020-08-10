@@ -32,6 +32,7 @@ def compute_row_col(square: int) -> (int, int):
 def create_sudoku(board: List[List[int]]) -> Dict:
     result = {}
     result['guesses'] = 0
+    result['removes'] = 0
     result['board'] = np.array(board) # 2d array
     result['rows'] = [set(filter((lambda x: x != 0), row)) for row in result['board']]
     result['cols'] = [set(filter((lambda x: x != 0), col)) for col in result['board'].T]
@@ -83,6 +84,7 @@ def fill_number(sudoku: dict, row: int, col: int, number: int) -> dict:
 def remove_number(sudoku: dict, row: int, col: int) -> dict:
     sudoku = sudoku.copy()
     num = sudoku['board'][row, col]
+    sudoku['removes'] += 1
     sudoku['board'][row, col] = 0
     sudoku['rows'][row].discard(num)
     sudoku['cols'][col].discard(num)
