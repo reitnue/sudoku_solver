@@ -214,3 +214,20 @@ def test_priority_backtracking_heap(class_board, func_board):
     assert is_equal_boards(class_board, func_board)
     assert guesses == func_board['guesses']
 
+
+def test_human_first_backtracking(class_board, func_board):
+    solver.human_first_backtracking(class_board, [solver.numberwise])
+    is_complete, func_board = func_solver.human_first_backtracking(func_board, [func_solver.numberwise])
+    assert is_complete
+
+
+def test_human_mixed_backtracking(class_board, func_board):
+    solver.human_mixed_backtracking(class_board, solver.numberwise)
+    is_complete, func_board = func_solver.human_mixed_backtracking(func_board, func_solver.numberwise)
+    assert is_complete
+
+
+def test_human_mixed_priority_backtracking(class_board, func_board):
+    solver.human_mixed_priority_backtracking_heap(class_board, solver.numberwise)
+    is_complete, func_board = func_solver.human_mixed_priority_backtracking_heap(func_board, func_solver.numberwise)
+    assert is_complete
