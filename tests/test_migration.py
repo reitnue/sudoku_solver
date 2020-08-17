@@ -1,3 +1,5 @@
+# pylint: disable=redefined-outer-name
+
 import pytest
 from src import sudoku
 from src import func_sudoku
@@ -93,7 +95,8 @@ def test_valid_numbers(class_board, func_board):
     '''
     for row in range(9):
         for col in range(9):
-            assert class_board.valid_numbers(row, col) == func_sudoku.valid_numbers(func_board, row, col)
+            assert class_board.valid_numbers(row, col) == \
+                func_sudoku.valid_numbers(func_board, row, col)
 
 
 # stateful methods
