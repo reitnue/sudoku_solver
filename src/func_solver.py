@@ -12,7 +12,7 @@ from src.time_utils import Timer
 heuristics
 '''
 def cellwise(game, test=False):
-    game = game.copy()
+    game = copy.deepcopy(game)
     if test: print('cellwise')
     solves = []
     count = 0
@@ -34,7 +34,7 @@ def cellwise(game, test=False):
     return game, solves
 
 def numberwise(game, test=False):
-    game = game.copy()
+    game = copy.deepcopy(game)
     if test: print('numberwise')
     count = 0
     solves = []
@@ -63,6 +63,27 @@ def numberwise(game, test=False):
         if not change:
             break
     return game, solves
+
+
+def aggregate_pure_solver(game, heuristics):
+    '''
+    function to aggregate pure heuristics
+    heuristics: list of heuristic solver fxns
+    game: game
+    returns: game, solves (standard heuristic return form)
+    '''
+    game = copy.deepcopy(game)
+    solves = []
+    while True:
+        curr_solves = []
+        for heuristic in heuristics:
+            game, new_solves = heuristic(game)
+            curr_solves += new_solves
+        if len(curr_solves) == 0:
+            break
+        solves += curr_solves
+    return game, solves
+
 
 def backtracking(game, test=False):
     game = copy.deepcopy(game) 
@@ -202,7 +223,7 @@ def human_mixed_priority_backtracking_heap(game, heuristic, test=False):
     game = copy.deepcopy(game)
     # heuristic
     guesses = 0
-    game, solved = heuristic(game, test=test)
+    game, solved = heuristic(game)
     if func_sudoku.is_completed(game):
         return True, game
     pq = []
@@ -220,13 +241,13 @@ def human_mixed_priority_backtracking_heap(game, heuristic, test=False):
         if not done:
             # remove past fill ins
             for x, y in solved:
-                func_sudoku.remove_number(game, x, y)
-            func_sudoku.remove_number(game, row, col)
+                game = func_sudoku.remove_number(game, x, y)
+            game = func_sudoku.remove_number(game, row, col)
         else:
             return True, game
     if game['board'][row, col] == 0:
         for x, y in solved:
-            func_sudoku.remove_number(game, x, y)
+            game = func_sudoku.remove_number(game, x, y)
         return False, game # impossible
 
 
