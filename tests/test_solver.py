@@ -1,8 +1,8 @@
 # pylint: disable=redefined-outer-name
 
 import pytest
-from src import func_sudoku
-from src import func_solver
+from src import sudoku
+from src import solver
 
 easy_board = [
     [0, 5, 8, 0, 0, 0, 0, 0, 0],
@@ -24,8 +24,8 @@ def board():
 
 
 @pytest.fixture
-def func_game(board):
-    return func_sudoku.create_sudoku(board)
+def game(board):
+    return sudoku.create_sudoku(board)
 
 
 def test_aggregate_pure_solver_numberwise(board):
@@ -33,18 +33,18 @@ def test_aggregate_pure_solver_numberwise(board):
     tests the aggregate pure solver in a basic way:
         does at least as well as number/cell wise
     '''
-    game_a = func_sudoku.create_sudoku(board)
-    game_b = func_sudoku.create_sudoku(board)
-    game_c = func_sudoku.create_sudoku(board)
+    game_a = sudoku.create_sudoku(board)
+    game_b = sudoku.create_sudoku(board)
+    game_c = sudoku.create_sudoku(board)
 
-    new_game_a, a_solves = func_solver.aggregate_pure_solver(
+    new_game_a, a_solves = solver.aggregate_pure_solver(
                             game_a, 
                             [
-                                func_solver.numberwise,
-                                func_solver.cellwise
+                                solver.numberwise,
+                                solver.cellwise
                             ])
-    end_game_a, a_next_solves = func_solver.numberwise(new_game_a)
+    end_game_a, a_next_solves = solver.numberwise(new_game_a)
     assert len(a_next_solves) == 0 # no more solves
     
-    new_game_b, b_solves = func_solver.numberwise(game_b)
+    new_game_b, b_solves = solver.numberwise(game_b)
     assert len(a_solves) >= len(b_solves) # does at least as good
