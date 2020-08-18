@@ -6,62 +6,6 @@ import copy
 import src.sudoku as sudoku
 from src.time_utils import Timer
 
-'''
-heuristics
-'''
-def cellwise(game, test=False):
-    game = copy.deepcopy(game)
-    if test: print('cellwise')
-    solves = []
-    count = 0
-    while True:
-        if test: print('--------{}--------'.format(count))
-        count += 1
-        change = False
-        for i in range(9):
-            for j in range(9):
-                if game['board'][i, j] == 0:
-                    if len(sudoku.valid_numbers(game, i, j)) == 1:
-                        game = sudoku.fill_number(game, i, j, sudoku.valid_numbers(game, i, j)[0])
-                        solves.append((i, j))
-                        change = True
-        if test: print(game)
-        # print('-----------------')
-        if not change:
-            break
-    return game, solves
-
-def numberwise(game, test=False):
-    game = copy.deepcopy(game)
-    if test: print('numberwise')
-    count = 0
-    solves = []
-    while True:
-        if test: print('--------{}--------'.format(count))
-        count += 1
-        change = False
-        # rows/cols
-        for ax in range(2):
-            for index in range(9):
-                for number in range(1, 10):
-                    pos = sudoku.valid_positions(game, number, index, axis=ax)
-                    if len(pos) == 1:
-                        game = sudoku.fill_number(game, pos[0][0], pos[0][1], number)
-                        solves.append((pos[0][0], pos[0][1]))
-                        change = True
-        # squares
-        for square in range(9):
-            for number in range(1, 10):
-                pos = sudoku.valid_positions_square(game, number, square)
-                if len(pos) == 1:
-                    game = sudoku.fill_number(game, pos[0][0], pos[0][1], number)
-                    solves.append((pos[0][0], pos[0][1]))
-                    change = True
-        if test: print(game)
-        if not change:
-            break
-    return game, solves
-
 
 def aggregate_pure_solver(game, heuristics):
     '''
@@ -182,44 +126,6 @@ def human_mixed_backtracking(game, heuristic, test=False):
                         game = sudoku.remove_number(game, x, y)
                     return False, game # impossible
 
-
-def priority_valid_nums(game):
-    pq = []
-    for row in range(9):
-        for col in range(9):
-            if game['board'][row, col] == 0:
-                p = len(sudoku.valid_numbers(game, row, col))
-                for num in sudoku.valid_numbers(game, row, col):
-                    noise = rand.random()
-                    heapq.heappush(pq, (p+noise, num, row, col))
-    while len(pq) > 0:
-        yield heapq.heappop(pq)
-
-
-def priority_number_count(game):
-    '''
-    assigns priority based on how many of each number is left
-    '''
-    game_number_count = sudoku.number_count(game)
-    pq = []
-    for row in range(9):
-        for col in range(9):
-            if game['board'][row, col] == 0:
-                for num in sudoku.valid_numbers(game, row, col):
-                    noise = rand.random()
-                    p = game_number_count.get(num, 9) + noise
-                    heapq.heappush(pq, (p, num, row, col))
-
-    while len(pq) > 0:
-        yield heapq.heappop(pq)
-
-
-def pr_valid_nums(game, num, row, col):
-    return len(sudoku.valid_numbers(game, row, col))
-
-
-def pr_number_count(game, num, row, col):
-    return sudoku.number_count(game).get(num, 9)
 
 
 def priority_func(game, priorities, weights=None):
