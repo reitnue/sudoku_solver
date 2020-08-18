@@ -45,15 +45,15 @@ def create_sudoku(board: List[List[int]]) -> Dict:
     return result
 
 
-def print_board(sudoku: dict) -> str:
+def print_board(sudoku: Dict) -> str:
     return '\n'.join([' '.join(map(str, x)) for x in sudoku['board']])
 
 
-def empty_cell_count(sudoku: dict) -> int:
+def empty_cell_count(sudoku: Dict) -> int:
     return len([x for x in sudoku['board'].flatten() if x == 0])
 
 
-def valid_numbers(sudoku: dict, row: int, col: int) -> int:
+def valid_numbers(sudoku: Dict, row: int, col: int) -> int:
     '''
     given row, col and board
     returns sorted list of valid numbers in the cell

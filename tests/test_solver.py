@@ -3,6 +3,9 @@
 import pytest
 from src import sudoku
 from src import solver
+from src import heuristics
+from src import priorities
+from src import utils
 
 easy_board = [
     [0, 5, 8, 0, 0, 0, 0, 0, 0],
@@ -37,14 +40,14 @@ def test_aggregate_pure_solver_numberwise(board):
     game_b = sudoku.create_sudoku(board)
     game_c = sudoku.create_sudoku(board)
 
-    new_game_a, a_solves = solver.aggregate_pure_solver(
+    new_game_a, a_solves = utils.aggregate_pure_solver(
                             game_a, 
                             [
-                                solver.numberwise,
-                                solver.cellwise
+                                heuristics.numberwise,
+                                heuristics.cellwise
                             ])
-    end_game_a, a_next_solves = solver.numberwise(new_game_a)
+    end_game_a, a_next_solves = heuristics.numberwise(new_game_a)
     assert len(a_next_solves) == 0 # no more solves
     
-    new_game_b, b_solves = solver.numberwise(game_b)
+    new_game_b, b_solves = heuristics.numberwise(game_b)
     assert len(a_solves) >= len(b_solves) # does at least as good
