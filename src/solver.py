@@ -27,106 +27,9 @@ def aggregate_pure_solver(game, heuristics):
     return game, solves
 
 
-def backtracking(game, test=False):
-    game = copy.deepcopy(game) 
-    if sudoku.is_completed(game):
-        return True, game 
-    for row in range(9):
-        for col in range(9):
-            if game['board'][row, col] == 0:
-                for num in range(1, 10):
-                    if num not in sudoku.valid_numbers(game, row, col):
-                        continue
-                    game = sudoku.fill_number(game, row, col, num)
-                    game['guesses'] += 1
-                    result, game = backtracking(game)
-                    if not result: # did not work -> backtrack
-                        # remove number
-                        game = sudoku.remove_number(game, row, col)
-                    else:
-                        return True, game 
-                if game['board'][row, col] == 0:
-                    return False, game 
-
-
-def priority_backtracking_heap(game, random=False, test=False):
-    game = copy.deepcopy(game)
-    if sudoku.is_completed(game):
-        return True, game
-    pq = []
-    for row in range(9):
-        for col in range(9):
-            if game['board'][row, col] == 0:
-                weight = rand.random()/2 if random else 0
-                heapq.heappush(pq, (len(sudoku.valid_numbers(game, row, col))+weight, row, col))
-
-    priority, row, col = heapq.heappop(pq)
-    # print(priority)
-    for num in sudoku.valid_numbers(game, row, col):
-        sudoku.fill_number(game, row, col, num)
-        game['guesses'] += 1
-        done, game = priority_backtracking_heap(game)
-        if not done: # did not work -> backtrack
-            # remove number
-            sudoku.remove_number(game, row, col)
-        else:
-            return True, game
-    if game['board'][row, col] == 0:
-        return False, game
-
-
 '''
-cellwise -> numberwise (fastest)
+cellwise -> numberwise (fastest time)
 '''
-def human_first_backtracking(game, humans, test=False):
-    game = copy.deepcopy(game)
-    while True:
-        change = False
-        for human in humans:
-            game, solves = human(game, test=test)
-            if len(solves) > 0:
-                change = True
-        if not change:
-            break
-    return backtracking(game)
-
-
-'''
-backtrack with human methods
-1. backtrack method one -> 
-keep track of which cells were filled in remove then for backtrack
-2. keep this information in game board ->
-keep a tuple (#, level) for each level/depth of the backtracking
-'''
-def human_mixed_backtracking(game, heuristic, test=False):
-    game = copy.deepcopy(game)
-    # heuristic
-    game, solved = heuristic(game, test=test)
-    if sudoku.is_completed(game):
-        return True, game
-    # guess -> backtracking
-    for row in range(9):
-        for col in range(9):
-            if game['board'][row, col] == 0:
-                for num in range(1, 10):
-                    if num not in sudoku.valid_numbers(game, row, col):
-                        continue
-                    game = sudoku.fill_number(game, row, col, num)
-                    game['guesses'] += 1
-                    done, game = human_mixed_backtracking(game, heuristic, test=test)
-                    if not done:
-                        # remove past fill ins
-                        for x, y in solved:
-                            game = sudoku.remove_number(game, x, y)
-                        game = sudoku.remove_number(game, row, col)
-                    else:
-                        return True, game
-                if game['board'][row, col] == 0:
-                    for x, y in solved:
-                        game = sudoku.remove_number(game, x, y)
-                    return False, game # impossible
-
-
 
 def priority_func(game, priorities, weights=None):
     if weights == None:
@@ -153,42 +56,6 @@ def mixed_heuristic_priority_backtracking(game, heuristic, priority, test=False)
         return True, game
     
     for priority, num, row, col in priority(game):
-        game = sudoku.fill_number(game, row, col, num)
-        game['guesses'] += 1
-        done, game = human_mixed_priority_backtracking_heap(game, heuristic, test=test)
-        if not done:
-            # remove past fill ins
-            for x, y in solved:
-                game = sudoku.remove_number(game, x, y)
-            game = sudoku.remove_number(game, row, col)
-        else:
-            return True, game
-
-    if game['board'][row, col] == 0: # for backtracking...
-        for x, y in solved:
-            game = sudoku.remove_number(game, x, y)
-        return False, game
-
-
-def human_mixed_priority_backtracking_heap(game, heuristic, test=False):
-    game = copy.deepcopy(game)
-    # heuristic
-    guesses = 0
-    game, solved = heuristic(game)
-    if sudoku.is_completed(game):
-        return True, game
-    
-    # begin priority
-    pq = []
-    for row in range(9):
-        for col in range(9):
-            if game['board'][row, col] == 0:
-                heapq.heappush(pq, (len(sudoku.valid_numbers(game, row, col)), row, col))
-    
-    priority, row, col = heapq.heappop(pq)
-    
-    # guessing
-    for num in sudoku.valid_numbers(game, row, col):
         game = sudoku.fill_number(game, row, col, num)
         game['guesses'] += 1
         done, game = human_mixed_priority_backtracking_heap(game, heuristic, test=test)

@@ -4,6 +4,7 @@ and related data structures
 '''
 from typing import List, Dict
 import numpy as np
+import copy
 
 INDICES = [0, 3, 6]
 
@@ -69,7 +70,7 @@ def valid_numbers(sudoku: dict, row: int, col: int) -> int:
 
 
 def fill_number(sudoku: dict, row: int, col: int, number: int) -> dict:
-    sudoku = sudoku.copy()
+    sudoku = copy.deepcopy(sudoku)
     if number not in valid_numbers(sudoku, row, col) or \
         sudoku['board'][row, col] != 0:
         # invalid fill or already filled
@@ -84,7 +85,7 @@ def fill_number(sudoku: dict, row: int, col: int, number: int) -> dict:
 
 
 def remove_number(sudoku: dict, row: int, col: int) -> dict:
-    sudoku = sudoku.copy()
+    sudoku = copy.deepcopy(sudoku)
     num = sudoku['board'][row, col]
     sudoku['removes'] += 1
     sudoku['solves'] -= 1
@@ -104,7 +105,6 @@ def is_completed(sudoku: dict):
 
 
 def valid_positions(sudoku: dict, number: int, index: int, axis: int) -> List:
-    sudoku = sudoku.copy()
     set_lists = sudoku['rows'] if axis == 0 else sudoku['cols']
     if number in set_lists[index]:
         # already in row or col
