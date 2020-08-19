@@ -36,7 +36,7 @@ def priority_func(game, priorities, weights=None):
         for col in range(9):
             if game['board'][row, col] == 0:
                 for num in sudoku.valid_numbers(game, row, col):
-                    noise = rand.random()
+                    noise = rand.random() / 20
                     p = sum([pr(game, num, row, col)*wt for pr, wt in zip(priorities, weights)]) + noise
                     heapq.heappush(pq, (p, num, row, col))
 
